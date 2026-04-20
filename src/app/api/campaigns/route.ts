@@ -37,13 +37,13 @@ export async function POST(req: NextRequest) {
   try {
     await connectToDatabase();
     const body = await req.json();
-    const { name, subject, body: emailBody, tags, status, categoria } = body;
+    const { name, subject, body: emailBody, tags, status, categoria, startDate, endDate } = body;
 
     if (!name || !subject || !emailBody) {
       return NextResponse.json({ error: "Nombre, asunto y cuerpo son obligatorios." }, { status: 400 });
     }
 
-    const campaign = await Campaign.create({ name, subject, body: emailBody, tags, status, categoria });
+    const campaign = await Campaign.create({ name, subject, body: emailBody, tags, status, categoria, startDate: startDate || undefined, endDate: endDate || undefined });
     return NextResponse.json(campaign, { status: 201 });
   } catch (error) {
     console.error("[POST /api/campaigns]", error);

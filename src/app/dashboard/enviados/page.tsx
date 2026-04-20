@@ -49,7 +49,7 @@ export default async function EnviadosPage() {
           <span className="col-span-2">Categoría</span>
           <span className="col-span-1 text-center">Enviados</span>
           <span className="col-span-1 text-center">Abiertos</span>
-          <span className="col-span-2">Fecha envío</span>
+          <span className="col-span-2">Periodo</span>
         </div>
 
         {campaigns.length === 0 ? (
@@ -100,11 +100,18 @@ export default async function EnviadosPage() {
                     )}
                   </span>
                   <span className="col-span-2 text-sm text-zinc-500">
-                    {c.sentAt
-                      ? new Date(c.sentAt).toLocaleDateString("es-ES", {
-                          day: "2-digit", month: "short", year: "numeric",
-                        })
-                      : "—"}
+                    {(c as unknown as { startDate?: string; endDate?: string }).startDate ? (
+                      <span>
+                        {new Date((c as unknown as { startDate: string }).startDate).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}
+                        {(c as unknown as { endDate?: string }).endDate && (
+                          <> → {new Date((c as unknown as { endDate: string }).endDate).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}</>
+                        )}
+                      </span>
+                    ) : c.sentAt ? (
+                      new Date(c.sentAt).toLocaleDateString("es-ES", {
+                        day: "2-digit", month: "short", year: "numeric",
+                      })
+                    ) : "—"}
                   </span>
                 </div>
               );

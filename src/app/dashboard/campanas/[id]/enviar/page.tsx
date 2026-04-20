@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2, Send, Users, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, Send, Users, CheckCircle2, XCircle, Search, FileText } from "lucide-react";
 
 interface Contact {
   _id: string;
   name: string;
   email: string;
   company?: string;
+  localidad?: string;
+  objetivo?: string;
+  notes?: string;
   status: string;
 }
 
@@ -28,6 +31,8 @@ export default function EnviarCampanaPage() {
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [filtered, setFiltered] = useState<Contact[]>([]);
+  const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loadingData, setLoadingData] = useState(true);
   const [sending, setSending] = useState(false);
@@ -37,20 +42,34 @@ export default function EnviarCampanaPage() {
   useEffect(() => {
     Promise.all([
       fetch(`/api/campaigns/${id}`).then((r) => r.json()),
-      fetch("/api/contacts?limit=200").then((r) => r.json()),
+      fetch("/api/contacts?limit=500").then((r) => r.json()),
     ]).then(([camp, cont]) => {
       setCampaign(camp);
       const activos = (cont.contacts ?? []).filter((c: Contact) => c.status === "activo");
       setContacts(activos);
+      setFiltered(activos);
       setLoadingData(false);
     });
   }, [id]);
 
+  useEffect(() => {
+    const q = search.toLowerCase();
+    setFiltered(
+      contacts.filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+          c.email.toLowerCase().includes(q) ||
+          (c.company ?? "").toLowerCase().includes(q) ||
+          (c.notes ?? "").toLowerCase().includes(q)
+      )
+    );
+  }, [search, contacts]);
+
   function toggleAll() {
-    if (selected.size === contacts.length) {
+    if (selected.size === filtered.length) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(contacts.map((c) => c._id)));
+      setSelected(new Set(filtered.map((c) => c._id)));
     }
   }
 
@@ -163,37 +182,69 @@ export default function EnviarCampanaPage() {
             <Users size={18} className="text-zinc-400" />
             <span className="text-sm font-semibold text-zinc-700">
               Contactos activos ({contacts.length})
+              {search && filtered.length !== contacts.length && (
+                <span className="ml-1.5 text-xs text-zinc-400 font-normal">· {filtered.length} filtrados</span>
+              )}
             </span>
           </div>
-          <button
-            onClick={toggleAll}
-            className="text-sm text-purple-600 hover:underline font-medium"
-          >
-            {selected.size === contacts.length ? "Deseleccionar todos" : "Seleccionar todos"}
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+              <input
+                type="text"
+                placeholder="Buscar contacto..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8 pr-3 py-1.5 text-xs border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white w-48"
+              />
+            </div>
+            <button
+              onClick={toggleAll}
+              className="text-sm text-purple-600 hover:underline font-medium whitespace-nowrap"
+            >
+              {selected.size === filtered.length && filtered.length > 0 ? "Deseleccionar todos" : "Seleccionar todos"}
+            </button>
+          </div>
         </div>
 
-        {contacts.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-center">
             <XCircle size={24} className="text-zinc-300 mb-3" />
             <p className="text-sm text-zinc-500">No hay contactos activos disponibles.</p>
           </div>
         ) : (
-          <div className="divide-y divide-zinc-100 max-h-[420px] overflow-y-auto">
-            {contacts.map((c) => (
+          <div className="divide-y divide-zinc-100 max-h-[520px] overflow-y-auto">
+            {filtered.map((c) => (
               <label
                 key={c._id}
-                className="flex items-center gap-4 px-6 py-3 hover:bg-zinc-50 cursor-pointer transition-colors"
+                className="flex items-start gap-4 px-6 py-3.5 hover:bg-zinc-50 cursor-pointer transition-colors"
               >
                 <input
                   type="checkbox"
                   checked={selected.has(c._id)}
                   onChange={() => toggleOne(c._id)}
-                  className="w-4 h-4 rounded accent-purple-600"
+                  className="w-4 h-4 mt-0.5 rounded accent-purple-600 flex-shrink-0"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-zinc-900">{c.name}</p>
-                  <p className="text-xs text-zinc-500">{c.email}{c.company ? ` · ${c.company}` : ""}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-medium text-zinc-900">{c.name}</p>
+                    {c.objetivo === "pagina-web" && (
+                      <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full">🌐 Web</span>
+                    )}
+                    {c.objetivo === "servicios-informaticos" && (
+                      <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">💻 IT</span>
+                    )}
+                    {c.localidad && (
+                      <span className="text-xs text-zinc-400">📍 {c.localidad}</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-zinc-500 mt-0.5">{c.email}{c.company ? ` · ${c.company}` : ""}</p>
+                  {c.notes && (
+                    <div className="flex items-start gap-1.5 mt-1.5 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5">
+                      <FileText size={12} className="text-amber-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-amber-800 leading-relaxed">{c.notes}</p>
+                    </div>
+                  )}
                 </div>
               </label>
             ))}

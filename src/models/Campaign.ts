@@ -11,6 +11,8 @@ export interface ICampaign extends Document {
   status: "borrador" | "enviada" | "programada";
   tags: string[];
   recipientCount: number;
+  startDate?: Date;
+  endDate?: Date;
   sentAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -30,6 +32,8 @@ const CampaignSchema = new Schema<ICampaign>(
     status: { type: String, enum: ["borrador", "enviada", "programada"], default: "borrador" },
     tags: { type: [String], default: [] },
     recipientCount: { type: Number, default: 0 },
+    startDate: { type: Date },
+    endDate: { type: Date },
     sentAt: { type: Date },
   },
   { timestamps: true }

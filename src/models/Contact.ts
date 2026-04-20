@@ -13,6 +13,7 @@ export interface IContact extends Document {
   status: "activo" | "inactivo" | "no-contactar";
   unsubscribed: boolean;
   unsubscribedAt?: Date;
+  archived: boolean;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -32,6 +33,7 @@ const ContactSchema = new Schema<IContact>(
     status: { type: String, enum: ["activo", "inactivo", "no-contactar"], default: "activo" },
     unsubscribed: { type: Boolean, default: false },
     unsubscribedAt: { type: Date },
+    archived: { type: Boolean, default: false },
     notes: { type: String },
   },
   { timestamps: true }

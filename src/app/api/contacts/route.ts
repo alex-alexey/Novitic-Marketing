@@ -12,11 +12,12 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const q = searchParams.get("q") ?? "";
     const profesion = searchParams.get("profesion") ?? "";
+    const showArchived = searchParams.get("archived") === "true";
     const page = parseInt(searchParams.get("page") ?? "1");
     const limit = parseInt(searchParams.get("limit") ?? "20");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const filter: Record<string, any> = {};
+    const filter: Record<string, any> = { archived: showArchived ? true : { $ne: true } };
     if (q) {
       filter.$or = [
         { name: { $regex: q, $options: "i" } },

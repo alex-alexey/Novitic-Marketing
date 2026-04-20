@@ -192,6 +192,8 @@ interface CampaignFormProps {
     status?: string;
     categoria?: string;
     tags?: string[];
+    startDate?: string;
+    endDate?: string;
   };
   onSubmit: (data: Record<string, unknown>) => Promise<void>;
   submitLabel: string;
@@ -205,6 +207,8 @@ export default function CampaignForm({ initial = {}, onSubmit, submitLabel }: Ca
     body: initial.body ?? "",
     status: initial.status ?? "borrador",
     categoria: initial.categoria ?? "otro",
+    startDate: initial.startDate ? initial.startDate.slice(0, 10) : "",
+    endDate: initial.endDate ? initial.endDate.slice(0, 10) : "",
   });
   const [tags, setTags] = useState<string[]>(initial.tags ?? []);
   const [tagInput, setTagInput] = useState("");
@@ -265,6 +269,24 @@ export default function CampaignForm({ initial = {}, onSubmit, submitLabel }: Ca
             <option value="programada">Programada</option>
             <option value="enviada">Enviada</option>
           </select>
+        </div>
+      </div>
+
+      {/* Fechas de campaña */}
+      <div className="grid grid-cols-2 gap-5">
+        <div>
+          <label className="block text-sm font-medium text-zinc-700 mb-1">Fecha inicio</label>
+          <input
+            type="date" name="startDate" value={form.startDate} onChange={handleChange}
+            className="w-full rounded-lg border border-zinc-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-zinc-700 mb-1">Fecha fin</label>
+          <input
+            type="date" name="endDate" value={form.endDate} onChange={handleChange}
+            className="w-full rounded-lg border border-zinc-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+          />
         </div>
       </div>
 

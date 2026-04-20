@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Search, Trash2, Pencil, Loader2, Download, Upload, CheckCircle2, AlertCircle } from "lucide-react";
+import { Plus, Search, Trash2, Pencil, Loader2, Download, Upload, CheckCircle2, AlertCircle, Archive, ArchiveRestore } from "lucide-react";
 
 interface Contact {
   _id: string;
@@ -16,6 +16,7 @@ interface Contact {
   objetivo?: string;
   status: "activo" | "inactivo" | "no-contactar";
   unsubscribed?: boolean;
+  archived?: boolean;
   tags: string[];
   createdAt: string;
 }
@@ -33,6 +34,7 @@ export default function ContactosPage() {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const [profesionFilter, setProfesionFilter] = useState("");
+  const [showArchived, setShowArchived] = useState(false);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
@@ -40,10 +42,11 @@ export default function ContactosPage() {
   const [importError, setImportError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchContacts = useCallback(async (q: string, p: number, prof: string) => {
+  const fetchContacts = useCallback(async (q: string, p: number, prof: string, archived: boolean) => {
     setLoading(true);
     const params = new URLSearchParams({ q, page: String(p), limit: "10" });
     if (prof) params.set("profesion", prof);
+    if (archived) params.set("archived", "true");
     const res = await fetch(`/api/contacts?${params.toString()}`);
     const data = await res.json();
     setContacts(data.contacts ?? []);
@@ -54,19 +57,28 @@ export default function ContactosPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [query, profesionFilter]);
+  }, [query, profesionFilter, showArchived]);
 
   useEffect(() => {
-    const t = setTimeout(() => fetchContacts(query, page, profesionFilter), 300);
+    const t = setTimeout(() => fetchContacts(query, page, profesionFilter, showArchived), 300);
     return () => clearTimeout(t);
-  }, [query, page, profesionFilter, fetchContacts]);
+  }, [query, page, profesionFilter, showArchived, fetchContacts]);
+
+  async function handleArchive(id: string, archive: boolean) {
+    await fetch(`/api/contacts/${id}/archive`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ archived: archive }),
+    });
+    fetchContacts(query, page, profesionFilter, showArchived);
+  }
 
   async function handleDelete(id: string, name: string) {
     if (!confirm(`¿Eliminar a ${name}?`)) return;
     setDeleting(id);
     await fetch(`/api/contacts/${id}`, { method: "DELETE" });
     setDeleting(null);
-    fetchContacts(query, page, profesionFilter);
+    fetchContacts(query, page, profesionFilter, showArchived);
   }
 
   function handleExport() {
@@ -88,7 +100,7 @@ export default function ContactosPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al importar.");
       setImportResult({ imported: data.imported, skipped: data.skipped });
-      fetchContacts(query, page, profesionFilter);
+      fetchContacts(query, page, profesionFilter, showArchived);
     } catch (err) {
       setImportError(err instanceof Error ? err.message : "Error al importar.");
     }
@@ -115,6 +127,17 @@ export default function ContactosPage() {
             className="hidden"
             onChange={handleImport}
           />
+          <button
+            onClick={() => setShowArchived((v) => !v)}
+            className={`flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-lg border transition-colors ${
+              showArchived
+                ? "bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100"
+                : "text-zinc-700 border-zinc-300 hover:bg-zinc-50"
+            }`}
+          >
+            {showArchived ? <ArchiveRestore size={15} /> : <Archive size={15} />}
+            {showArchived ? "Ver activos" : "Ver archivados"}
+          </button>
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={importing}
@@ -259,6 +282,13 @@ export default function ContactosPage() {
                   >
                     <Pencil size={15} />
                   </Link>
+                  <button
+                    onClick={() => handleArchive(c._id, !c.archived)}
+                    title={c.archived ? "Desarchivar" : "Archivar"}
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                  >
+                    {c.archived ? <ArchiveRestore size={15} /> : <Archive size={15} />}
+                  </button>
                   <button
                     onClick={() => handleDelete(c._id, c.name)}
                     disabled={deleting === c._id}
