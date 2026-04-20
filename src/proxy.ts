@@ -17,11 +17,12 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // Proteger APIs (excepto /api/auth y /api/track que son públicas)
+  // Proteger APIs (excepto /api/auth, /api/track y /api/unsubscribe que son públicas)
   if (
     pathname.startsWith("/api/") &&
     !pathname.startsWith("/api/auth") &&
-    !pathname.startsWith("/api/track")
+    !pathname.startsWith("/api/track") &&
+    !pathname.startsWith("/api/unsubscribe")
   ) {
     if (!sessionToken) {
       return NextResponse.json({ error: "No autorizado." }, { status: 401 });

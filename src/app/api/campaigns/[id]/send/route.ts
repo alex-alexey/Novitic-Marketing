@@ -41,6 +41,12 @@ export async function POST(req: NextRequest, { params }: Params) {
     const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 
     for (const contact of contacts) {
+      // Saltar contactos que se han dado de baja
+      if ((contact as unknown as { unsubscribed?: boolean }).unsubscribed) {
+        errors.push(`${contact.email} (dado de baja)`);
+        continue;
+      }
+
       try {
         const personalize = (text: string) =>
           text
@@ -59,9 +65,21 @@ export async function POST(req: NextRequest, { params }: Params) {
         });
 
         const pixelUrl = `${baseUrl}/api/track/${log._id}`;
+        const unsubscribeUrl = `${baseUrl}/api/unsubscribe/${contact._id}`;
         const trackingPixel = `<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;"/>`;
 
-        const personalizedBody = personalize(campaign.body) + trackingPixel;
+        const legalFooter = `
+<div style="margin-top:32px; padding-top:16px; border-top:1px solid #e4e4e7;">
+  <p style="font-size:11px; color:#a1a1aa; line-height:1.6; margin:0;">
+    <strong style="color:#71717a;">Novitic</strong> · info@novitic.com<br/>
+    Has recibido este email porque tu empresa puede estar interesada en nuestros servicios.<br/>
+    Tratamos tus datos bajo la base legal de interés legítimo (Art. 6.1.f RGPD) con fines de prospección comercial B2B.<br/>
+    Tienes derecho de acceso, rectificación, supresión y oposición enviando un email a <a href="mailto:info@novitic.com" style="color:#a1a1aa;">info@novitic.com</a>.<br/>
+    Si no deseas recibir más comunicaciones, <a href="${unsubscribeUrl}" style="color:#7c3aed;">haz clic aquí para darte de baja</a>.
+  </p>
+</div>`;
+
+        const personalizedBody = personalize(campaign.body) + legalFooter + trackingPixel;
         const personalizedSubject = personalize(campaign.subject);
 
         await transporter.sendMail({

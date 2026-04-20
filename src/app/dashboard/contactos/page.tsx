@@ -15,6 +15,7 @@ interface Contact {
   localidad?: string;
   objetivo?: string;
   status: "activo" | "inactivo" | "no-contactar";
+  unsubscribed?: boolean;
   tags: string[];
   createdAt: string;
 }
@@ -167,7 +168,7 @@ export default function ContactosPage() {
           <span className="col-span-1">Localidad</span>
           <span className="col-span-1">Objetivo</span>
           <span className="col-span-1">Estado</span>
-          <span className="col-span-2">Tags</span>
+          <span className="col-span-2">Web</span>
           <span className="col-span-1 text-right">Acciones</span>
         </div>
 
@@ -206,13 +207,18 @@ export default function ContactosPage() {
                   <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full ${statusStyles[c.status]}`}>
                     {c.status}
                   </span>
-                </span>
-                <span className="col-span-2 flex flex-wrap gap-1">
-                  {c.tags.slice(0, 2).map((tag) => (
-                    <span key={tag} className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
-                      {tag}
+                  {c.unsubscribed && (
+                    <span className="inline-block ml-1 text-xs font-medium px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">
+                      Baja
                     </span>
-                  ))}
+                  )}
+                </span>
+                <span className="col-span-2 text-sm text-zinc-500 truncate">
+                  {c.website ? (
+                    <a href={c.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline truncate block">
+                      {c.website.replace(/^https?:\/\//, "")}
+                    </a>
+                  ) : "—"}
                 </span>
                 <span className="col-span-1 flex justify-end gap-2">
                   <Link

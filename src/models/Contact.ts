@@ -11,6 +11,8 @@ export interface IContact extends Document {
   objetivo?: "pagina-web" | "servicios-informaticos" | "otro" | "";
   tags: string[];
   status: "activo" | "inactivo" | "no-contactar";
+  unsubscribed: boolean;
+  unsubscribedAt?: Date;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -28,6 +30,8 @@ const ContactSchema = new Schema<IContact>(
     objetivo: { type: String, enum: ["pagina-web", "servicios-informaticos", "otro", ""], default: "" },
     tags: { type: [String], default: [] },
     status: { type: String, enum: ["activo", "inactivo", "no-contactar"], default: "activo" },
+    unsubscribed: { type: Boolean, default: false },
+    unsubscribedAt: { type: Date },
     notes: { type: String },
   },
   { timestamps: true }
