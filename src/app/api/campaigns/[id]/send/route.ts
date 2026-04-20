@@ -38,7 +38,14 @@ export async function POST(req: NextRequest, { params }: Params) {
     let sent = 0;
     const errors: string[] = [];
 
-    const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+    const baseUrl = (() => {
+      // Derivar la URL base del request (funciona en local y en producción)
+      const origin = req.headers.get("origin") ?? req.headers.get("x-forwarded-host");
+      if (origin) return origin.startsWith("http") ? origin : `https://${origin}`;
+      const host = req.headers.get("host") ?? "localhost:3000";
+      const proto = req.headers.get("x-forwarded-proto") ?? "http";
+      return `${proto}://${host}`;
+    })();
 
     for (const contact of contacts) {
       // Saltar contactos que se han dado de baja
