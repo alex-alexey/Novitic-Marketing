@@ -25,6 +25,7 @@ const statusStyles = {
 const categoriaLabels = {
   "pagina-web": "🌐 Página Web",
   "servicios-informaticos": "💻 Servicios IT",
+  "clientes": "⭐ Clientes",
   otro: "📋 Otro",
 };
 

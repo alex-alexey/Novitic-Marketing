@@ -7,6 +7,7 @@ import { X, Wand2, ChevronDown } from "lucide-react";
 const CATEGORIAS = [
   { value: "pagina-web", label: "🌐 Página Web" },
   { value: "servicios-informaticos", label: "💻 Servicios Informáticos" },
+  { value: "clientes", label: "⭐ Clientes actuales" },
   { value: "otro", label: "📋 Otro" },
 ];
 
@@ -155,6 +156,74 @@ Novitic · <a href="https://novitic.com">novitic.com</a> · info@novitic.com</p>
 <p>En <strong>Novitic</strong> ofrecemos una <strong>auditoría de seguridad gratuita</strong> para que sepas exactamente en qué punto estáis. Sin coste, sin compromiso.</p>
 
 <p>¿Te interesa? Con una videollamada de 30 minutos tenemos suficiente.</p>
+
+<p>Un saludo,<br/>
+<strong>Alex</strong><br/>
+Novitic · <a href="https://novitic.com">novitic.com</a> · info@novitic.com</p>`,
+    },
+  ],
+  clientes: [
+    {
+      label: "Servicio adicional — ampliar lo que ya tienen",
+      subject: "{{nombre}}, ¿hablamos de lo que podemos añadir en {{empresa}}?",
+      body: `<p>Hola {{nombre}},</p>
+
+<p>¿Qué tal todo por <strong>{{empresa}}</strong>? Espero que todo vaya bien.</p>
+
+<p>Te escribo porque llevamos un tiempo trabajando juntos y creo que hay un paso más que podría interesarte. Dependiendo de cómo estéis ahora mismo, podría tener sentido ampliar lo que tenemos en marcha con:</p>
+<ul>
+  <li>🔄 <strong>Mantenimiento y actualizaciones</strong> — para que todo siga funcionando sin que tengas que preocuparte</li>
+  <li>📈 <strong>Mejoras de rendimiento o diseño</strong> — pequeños cambios que marcan diferencia</li>
+  <li>📧 <strong>Email corporativo profesional</strong> — si aún usáis correos genéricos</li>
+  <li>🔐 <strong>Copias de seguridad automáticas</strong> — protección ante cualquier imprevisto</li>
+</ul>
+
+<p>No es una propuesta genérica — es algo que he pensado específicamente para {{empresa}} según lo que ya conozco de vosotros.</p>
+
+<p>¿Tienes 15 minutos esta semana para hacer una llamada rápida?</p>
+
+<p>Un saludo,<br/>
+<strong>Alex</strong><br/>
+Novitic · <a href="https://novitic.com">novitic.com</a> · info@novitic.com</p>`,
+    },
+    {
+      label: "Revisión anual — seguimiento del servicio",
+      subject: "{{nombre}}, revisión de lo que llevamos hecho en {{empresa}}",
+      body: `<p>Hola {{nombre}},</p>
+
+<p>Han pasado unos meses desde que empezamos a trabajar con <strong>{{empresa}}</strong> y quería hacer un pequeño repaso de cómo está todo.</p>
+
+<p>Antes de escribirte he revisado el estado de vuestros servicios y en general todo está funcionando bien. Aun así, siempre hay cosas que se pueden optimizar o que conviene revisar.</p>
+
+<p>Me gustaría hacer contigo una llamada de 20 minutos para:</p>
+<ul>
+  <li>✅ Revisar que todo sigue funcionando como esperabais</li>
+  <li>💡 Contarte novedades que han salido y pueden ser relevantes para vosotros</li>
+  <li>🗓️ Planificar lo que tiene sentido hacer en los próximos meses</li>
+</ul>
+
+<p>También aprovecho para preguntarte: <strong>¿hay algo que os esté dando problemas o que queráis mejorar?</strong> Cuéntame y lo miramos.</p>
+
+<p>¿Cuándo tienes un hueco?</p>
+
+<p>Un saludo,<br/>
+<strong>Alex</strong><br/>
+Novitic · <a href="https://novitic.com">novitic.com</a> · info@novitic.com</p>`,
+    },
+    {
+      label: "Referidos — pedir recomendación",
+      subject: "{{nombre}}, una petición personal",
+      body: `<p>Hola {{nombre}},</p>
+
+<p>Espero que todo vaya genial en <strong>{{empresa}}</strong>. Ha sido un placer trabajar con vosotros y espero que sigamos haciéndolo durante mucho tiempo.</p>
+
+<p>Te escribo para pedirte algo directamente: <strong>¿conoces a algún empresario o directivo que pueda necesitar lo que hacemos?</strong></p>
+
+<p>No te pido que vendas nada — simplemente, si en algún momento alguien de tu entorno te comenta que tiene un problema con su web, con sus ordenadores o con cualquier tema de tecnología, estaría muy agradecido si nos mencionas.</p>
+
+<p>Como forma de agradecerte cualquier presentación que nos hagas, te invitamos a <strong>un mes de servicio gratuito</strong> si el contacto que nos presentes acaba siendo cliente.</p>
+
+<p>Gracias por confiar en nosotros, {{nombre}}. Lo valoramos de verdad.</p>
 
 <p>Un saludo,<br/>
 <strong>Alex</strong><br/>

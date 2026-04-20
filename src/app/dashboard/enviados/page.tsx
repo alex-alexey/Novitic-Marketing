@@ -30,6 +30,7 @@ export default async function EnviadosPage() {
   const categoriaLabels: Record<string, string> = {
     "pagina-web": "🌐 Página Web",
     "servicios-informaticos": "💻 Servicios IT",
+    "clientes": "⭐ Clientes",
     otro: "📋 Otro",
   };
 

@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
-export type CampaignCategory = "pagina-web" | "servicios-informaticos" | "otro";
+export type CampaignCategory = "pagina-web" | "servicios-informaticos" | "otro" | "clientes";
 
 export interface ICampaign extends Document {
   name: string;
@@ -25,7 +25,7 @@ const CampaignSchema = new Schema<ICampaign>(
     body: { type: String, required: true },
     categoria: {
       type: String,
-      enum: ["pagina-web", "servicios-informaticos", "otro"],
+      enum: ["pagina-web", "servicios-informaticos", "otro", "clientes"],
       default: "otro",
     },
     templateId: { type: Schema.Types.ObjectId, ref: "Template" },
