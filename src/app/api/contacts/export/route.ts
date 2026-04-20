@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Contact from "@/models/Contact";
+import { requireAuth } from "@/lib/auth-guard";
 
 export async function GET() {
+  const authError = await requireAuth();
+  if (authError) return authError;
   await connectToDatabase();
   const contacts = await Contact.find({}).sort({ createdAt: -1 }).lean();
 

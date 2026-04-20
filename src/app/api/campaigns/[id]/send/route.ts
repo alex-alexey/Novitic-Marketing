@@ -4,10 +4,13 @@ import Campaign from "@/models/Campaign";
 import Contact from "@/models/Contact";
 import EmailLog from "@/models/EmailLog";
 import nodemailer from "nodemailer";
+import { requireAuth } from "@/lib/auth-guard";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function POST(req: NextRequest, { params }: Params) {
+  const authError = await requireAuth();
+  if (authError) return authError;
   try {
     await connectToDatabase();
     const { id } = await params;

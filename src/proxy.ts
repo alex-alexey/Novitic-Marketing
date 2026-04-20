@@ -4,12 +4,12 @@ import type { NextRequest } from "next/server";
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Rutas protegidas
-  if (pathname.startsWith("/dashboard")) {
-    const sessionToken =
-      request.cookies.get("next-auth.session-token") ??
-      request.cookies.get("__Secure-next-auth.session-token");
+  const sessionToken =
+    request.cookies.get("next-auth.session-token") ??
+    request.cookies.get("__Secure-next-auth.session-token");
 
+  // Proteger rutas del dashboard
+  if (pathname.startsWith("/dashboard")) {
     if (!sessionToken) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
@@ -17,12 +17,19 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  // Proteger APIs (excepto /api/auth y /api/track que son públicas)
+  if (
+    pathname.startsWith("/api/") &&
+    !pathname.startsWith("/api/auth") &&
+    !pathname.startsWith("/api/track")
+  ) {
+    if (!sessionToken) {
+      return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+    }
+  }
+
   // Si ya está autenticado y va al login, redirigir al dashboard
   if (pathname === "/login") {
-    const sessionToken =
-      request.cookies.get("next-auth.session-token") ??
-      request.cookies.get("__Secure-next-auth.session-token");
-
     if (sessionToken) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
@@ -32,5 +39,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ["/dashboard/:path*", "/login", "/api/:path*"],
 };

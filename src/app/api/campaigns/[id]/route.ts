@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Campaign from "@/models/Campaign";
+import { requireAuth } from "@/lib/auth-guard";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
+  const authError = await requireAuth();
+  if (authError) return authError;
   try {
     await connectToDatabase();
     const { id } = await params;
@@ -18,6 +21,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
 }
 
 export async function PUT(req: NextRequest, { params }: Params) {
+  const authError = await requireAuth();
+  if (authError) return authError;
   try {
     await connectToDatabase();
     const { id } = await params;
@@ -32,6 +37,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
+  const authError = await requireAuth();
+  if (authError) return authError;
   try {
     await connectToDatabase();
     const { id } = await params;

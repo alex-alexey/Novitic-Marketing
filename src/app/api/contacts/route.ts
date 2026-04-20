@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Contact from "@/models/Contact";
+import { requireAuth } from "@/lib/auth-guard";
 
 // GET /api/contacts — listar con búsqueda y paginación
 export async function GET(req: NextRequest) {
+  const authError = await requireAuth();
+  if (authError) return authError;
   try {
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
@@ -39,10 +42,12 @@ export async function GET(req: NextRequest) {
 
 // POST /api/contacts — crear contacto
 export async function POST(req: NextRequest) {
+  const authError = await requireAuth();
+  if (authError) return authError;
   try {
     await connectToDatabase();
     const body = await req.json();
-    const { name, email, company, phone, website, tags, status, notes } = body;
+    const { name, email, company, phone, website, profesion, localidad, objetivo, tags, status, notes } = body;
 
     if (!name || !email) {
       return NextResponse.json({ error: "Nombre y email son obligatorios." }, { status: 400 });
@@ -53,7 +58,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ya existe un contacto con ese email." }, { status: 409 });
     }
 
-    const contact = await Contact.create({ name, email, company, phone, website, tags, status, notes });
+    const contact = await Contact.create({ name, email, company, phone, website, profesion, localidad, objetivo, tags, status, notes });
     return NextResponse.json(contact, { status: 201 });
   } catch (error) {
     console.error("[POST /api/contacts]", error);
