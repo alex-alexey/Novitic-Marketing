@@ -11,18 +11,22 @@ export async function GET(req: NextRequest) {
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const q = searchParams.get("q") ?? "";
+    const profesion = searchParams.get("profesion") ?? "";
     const page = parseInt(searchParams.get("page") ?? "1");
-    const limit = 20;
+    const limit = parseInt(searchParams.get("limit") ?? "20");
 
-    const filter = q
-      ? {
-          $or: [
-            { name: { $regex: q, $options: "i" } },
-            { email: { $regex: q, $options: "i" } },
-            { company: { $regex: q, $options: "i" } },
-          ],
-        }
-      : {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filter: Record<string, any> = {};
+    if (q) {
+      filter.$or = [
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { company: { $regex: q, $options: "i" } },
+      ];
+    }
+    if (profesion) {
+      filter.profesion = profesion;
+    }
 
     const [contacts, total] = await Promise.all([
       Contact.find(filter)

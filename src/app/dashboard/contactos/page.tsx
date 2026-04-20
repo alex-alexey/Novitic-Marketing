@@ -29,7 +29,10 @@ const statusStyles = {
 export default function ContactosPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [total, setTotal] = useState(0);
+  const [pages, setPages] = useState(1);
+  const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
+  const [profesionFilter, setProfesionFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
@@ -37,26 +40,33 @@ export default function ContactosPage() {
   const [importError, setImportError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchContacts = useCallback(async (q: string) => {
+  const fetchContacts = useCallback(async (q: string, p: number, prof: string) => {
     setLoading(true);
-    const res = await fetch(`/api/contacts?q=${encodeURIComponent(q)}`);
+    const params = new URLSearchParams({ q, page: String(p), limit: "10" });
+    if (prof) params.set("profesion", prof);
+    const res = await fetch(`/api/contacts?${params.toString()}`);
     const data = await res.json();
     setContacts(data.contacts ?? []);
     setTotal(data.total ?? 0);
+    setPages(data.pages ?? 1);
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    const t = setTimeout(() => fetchContacts(query), 300);
+    setPage(1);
+  }, [query, profesionFilter]);
+
+  useEffect(() => {
+    const t = setTimeout(() => fetchContacts(query, page, profesionFilter), 300);
     return () => clearTimeout(t);
-  }, [query, fetchContacts]);
+  }, [query, page, profesionFilter, fetchContacts]);
 
   async function handleDelete(id: string, name: string) {
     if (!confirm(`¿Eliminar a ${name}?`)) return;
     setDeleting(id);
     await fetch(`/api/contacts/${id}`, { method: "DELETE" });
     setDeleting(null);
-    fetchContacts(query);
+    fetchContacts(query, page, profesionFilter);
   }
 
   function handleExport() {
@@ -78,7 +88,7 @@ export default function ContactosPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al importar.");
       setImportResult({ imported: data.imported, skipped: data.skipped });
-      fetchContacts(query);
+      fetchContacts(query, page, profesionFilter);
     } catch (err) {
       setImportError(err instanceof Error ? err.message : "Error al importar.");
     }
@@ -146,16 +156,38 @@ export default function ContactosPage() {
         </div>
       )}
 
-      {/* Search */}
-      <div className="relative mb-5">
-        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
-        <input
-          type="text"
-          placeholder="Buscar por nombre, email o empresa..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-full max-w-md pl-10 pr-4 py-2.5 text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-        />
+      {/* Search + Filtros */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className="relative">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
+          <input
+            type="text"
+            placeholder="Buscar por nombre, email o empresa..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-80 pl-10 pr-4 py-2.5 text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          />
+        </div>
+        <select
+          value={profesionFilter}
+          onChange={(e) => setProfesionFilter(e.target.value)}
+          className="py-2.5 px-3 text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-zinc-700"
+        >
+          <option value="">Todas las profesiones</option>
+          <option value="Autónomo">Autónomo</option>
+          <option value="Empresario">Empresario</option>
+          <option value="Directivo">Directivo</option>
+          <option value="Freelance">Freelance</option>
+          <option value="Otro">Otro</option>
+        </select>
+        {profesionFilter && (
+          <button
+            onClick={() => setProfesionFilter("")}
+            className="text-xs text-zinc-500 hover:text-zinc-800 px-2 py-1 rounded-lg border border-zinc-200 hover:bg-zinc-50 transition-colors"
+          >
+            ✕ Limpiar filtro
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -240,6 +272,62 @@ export default function ContactosPage() {
           </div>
         )}
       </div>
+
+      {/* Paginación */}
+      {pages > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-sm text-zinc-500">
+            Página {page} de {pages} · {total} contacto{total !== 1 ? "s" : ""}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage(1)}
+              disabled={page === 1}
+              className="px-2.5 py-1.5 text-xs rounded-lg border border-zinc-300 text-zinc-600 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              «
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 text-xs rounded-lg border border-zinc-300 text-zinc-600 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Anterior
+            </button>
+            {Array.from({ length: Math.min(5, pages) }, (_, i) => {
+              const start = Math.max(1, Math.min(page - 2, pages - 4));
+              const p = start + i;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+                    p === page
+                      ? "bg-blue-600 text-white border-blue-600 font-semibold"
+                      : "border-zinc-300 text-zinc-600 hover:bg-zinc-50"
+                  }`}
+                >
+                  {p}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setPage((p) => Math.min(pages, p + 1))}
+              disabled={page === pages}
+              className="px-3 py-1.5 text-xs rounded-lg border border-zinc-300 text-zinc-600 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Siguiente
+            </button>
+            <button
+              onClick={() => setPage(pages)}
+              disabled={page === pages}
+              className="px-2.5 py-1.5 text-xs rounded-lg border border-zinc-300 text-zinc-600 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              »
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
