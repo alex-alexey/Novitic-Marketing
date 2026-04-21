@@ -30,22 +30,16 @@ function LoginForm() {
     if (result?.error) {
       setError("Email o contraseña incorrectos.");
     } else {
-      router.push("/dashboard");
+      router.push("/");
     }
   }
 
   return (
     <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-zinc-900">Novitic Marketing</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">Novitic Zona Clientes</h1>
         <p className="text-sm text-zinc-500 mt-1">Inicia sesión en tu cuenta</p>
       </div>
-
-      {registered && (
-        <p className="mb-4 text-sm text-green-700 bg-green-50 rounded-lg px-4 py-2 text-center">
-          ✅ Cuenta creada correctamente. Ya puedes iniciar sesión.
-        </p>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>

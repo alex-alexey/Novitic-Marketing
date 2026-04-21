@@ -23,7 +23,8 @@ interface ClienteFormProps {
       provincia?: string;
       pais?: string;
     };
-    serviciosContratados?: { nombre: string; precio: number; notas?: string }[];
+    serviciosContratados?: { nombre: string; precio: number; horasIncluidas?: number; notas?: string }[];
+    tarifaHoraExtra?: number;
     notas?: string;
   };
   onSubmit: (data: Record<string, unknown>) => Promise<void>;
@@ -49,10 +50,11 @@ export default function ClienteForm({ initial = {}, onSubmit, submitLabel }: Cli
       provincia: initial.datosFiscales?.provincia ?? "",
       pais: initial.datosFiscales?.pais ?? "",
     },
-    serviciosContratados: initial.serviciosContratados ?? [],
+    serviciosContratados: (initial.serviciosContratados ?? []).map((s) => ({ ...s, horasIncluidas: s.horasIncluidas ?? 0 })),
+    tarifaHoraExtra: initial.tarifaHoraExtra ?? 0,
     notas: initial.notas ?? "",
   });
-  const [servicio, setServicio] = useState({ nombre: "", precio: "", notas: "" });
+  const [servicio, setServicio] = useState({ nombre: "", precio: "", horasIncluidas: "", notas: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -78,7 +80,7 @@ export default function ClienteForm({ initial = {}, onSubmit, submitLabel }: Cli
       ...prev,
       serviciosContratados: [
         ...prev.serviciosContratados,
-        { nombre: srv.nombre, precio: srv.precio, notas: "" },
+        { nombre: srv.nombre, precio: srv.precio, horasIncluidas: 0, notas: "" },
       ],
     }));
     e.target.value = "";
@@ -90,10 +92,10 @@ export default function ClienteForm({ initial = {}, onSubmit, submitLabel }: Cli
       ...prev,
       serviciosContratados: [
         ...prev.serviciosContratados,
-        { nombre: servicio.nombre, precio: Number(servicio.precio), notas: servicio.notas },
+        { nombre: servicio.nombre, precio: Number(servicio.precio), horasIncluidas: Number(servicio.horasIncluidas) || 0, notas: servicio.notas },
       ],
     }));
-    setServicio({ nombre: "", precio: "", notas: "" });
+    setServicio({ nombre: "", precio: "", horasIncluidas: "", notas: "" });
   }
 
   function removeServicio(idx: number) {
@@ -201,6 +203,22 @@ export default function ClienteForm({ initial = {}, onSubmit, submitLabel }: Cli
           <option value="potencial">Potencial</option>
           <option value="inactivo">Inactivo</option>
         </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-zinc-700 mb-1">Tarifa hora extra (€/h)</label>
+        <div className="flex items-center gap-2">
+          <input
+            name="tarifaHoraExtra"
+            type="number"
+            min="0"
+            step="0.5"
+            value={form.tarifaHoraExtra}
+            onChange={(e) => setForm((prev) => ({ ...prev, tarifaHoraExtra: parseFloat(e.target.value) || 0 }))}
+            className="w-36 rounded-lg border border-zinc-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="0"
+          />
+          <span className="text-sm text-zinc-400">€ por hora adicional cuando se superen las horas incluidas</span>
+        </div>
       </div>
       <div>
         <label className="block text-sm font-medium text-zinc-700 mb-1">Notas</label>
@@ -329,7 +347,17 @@ export default function ClienteForm({ initial = {}, onSubmit, submitLabel }: Cli
             type="number"
             value={servicio.precio}
             onChange={handleServicioChange}
-            className="w-28 rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-24 rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="horasIncluidas"
+            placeholder="Horas inc."
+            type="number"
+            min="0"
+            value={servicio.horasIncluidas}
+            onChange={handleServicioChange}
+            title="Horas de soporte incluidas en este servicio"
+            className="w-24 rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             name="notas"
@@ -363,6 +391,24 @@ export default function ClienteForm({ initial = {}, onSubmit, submitLabel }: Cli
                   {s.notas && <span className="text-xs text-zinc-400 truncate">· {s.notas}</span>}
                 </div>
                 <div className="flex items-center gap-2 shrink-0 ml-3">
+                  <div className="flex items-center gap-1 bg-zinc-100 border border-zinc-200 rounded-full px-2.5 py-0.5" title="Horas de soporte incluidas">
+                    <input
+                      type="number"
+                      value={s.horasIncluidas ?? 0}
+                      min={0}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value) || 0;
+                        setForm((prev) => ({
+                          ...prev,
+                          serviciosContratados: prev.serviciosContratados.map((srv, idx) =>
+                            idx === i ? { ...srv, horasIncluidas: val } : srv
+                          ),
+                        }));
+                      }}
+                      className="w-10 text-sm font-semibold text-zinc-600 bg-transparent text-right focus:outline-none"
+                    />
+                    <span className="text-sm text-zinc-500">h</span>
+                  </div>
                   <div className="flex items-center gap-1 bg-blue-50 border border-blue-200 rounded-full px-2.5 py-0.5">
                     <input
                       type="number"
@@ -391,9 +437,12 @@ export default function ClienteForm({ initial = {}, onSubmit, submitLabel }: Cli
                 </div>
               </div>
             ))}
-            <div className="flex justify-end pt-1">
+            <div className="flex items-center justify-between pt-2 border-t border-zinc-100 mt-1">
+              <span className="text-xs text-zinc-400">
+                {form.serviciosContratados.reduce((sum, s) => sum + (s.horasIncluidas ?? 0), 0)}h incluidas en total
+              </span>
               <span className="text-xs text-zinc-500">
-                Total: <span className="font-semibold text-zinc-800">
+                Total servicios: <span className="font-semibold text-zinc-800">
                   {form.serviciosContratados.reduce((sum, s) => sum + s.precio, 0)}€/mes
                 </span>
               </span>

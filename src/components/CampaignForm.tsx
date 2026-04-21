@@ -8,6 +8,7 @@ const CATEGORIAS = [
   { value: "pagina-web", label: "🌐 Página Web" },
   { value: "servicios-informaticos", label: "💻 Servicios Informáticos" },
   { value: "clientes", label: "⭐ Clientes actuales" },
+  { value: "upsell", label: "🚀 Upsell — Venta cruzada" },
   { value: "otro", label: "📋 Otro" },
 ];
 
@@ -224,6 +225,83 @@ Novitic · <a href="https://novitic.com">novitic.com</a> · info@novitic.com</p>
 <p>Como forma de agradecerte cualquier presentación que nos hagas, te invitamos a <strong>un mes de servicio gratuito</strong> si el contacto que nos presentes acaba siendo cliente.</p>
 
 <p>Gracias por confiar en nosotros, {{nombre}}. Lo valoramos de verdad.</p>
+
+<p>Un saludo,<br/>
+<strong>Alex</strong><br/>
+Novitic · <a href="https://novitic.com">novitic.com</a> · info@novitic.com</p>`,
+    },
+  ],
+  upsell: [
+    {
+      label: "Upsell SEO — clientes con web",
+      subject: "{{nombre}}, vuestra web está bien — ahora hay que hacer que os encuentren",
+      body: `<p>Hola {{nombre}},</p>
+
+<p>Llevamos un tiempo trabajando con <strong>{{empresa}}</strong> y la web está funcionando bien. Pero hay algo en lo que todavía no hemos entrado y que creo que podría marcar una diferencia real para vosotros: <strong>el posicionamiento en Google (SEO)</strong>.</p>
+
+<p>Tener una buena web es el primer paso. El segundo es que los clientes te encuentren cuando buscan lo que ofreces. Ahora mismo, sin SEO, dependéis de que alguien ya os conozca o de que os lleguen por recomendación.</p>
+
+<p>Lo que incluiría el servicio SEO para <strong>{{empresa}}</strong>:</p>
+<ul>
+  <li>🔍 <strong>Auditoría de palabras clave</strong> — qué busca vuestro cliente ideal en Google</li>
+  <li>📝 <strong>Optimización de contenido</strong> — textos, títulos y estructura pensados para posicionar</li>
+  <li>📍 <strong>SEO local</strong> — aparecer en Google Maps y búsquedas de vuestra zona</li>
+  <li>📊 <strong>Informes mensuales</strong> — para que veáis la evolución y el impacto real</li>
+</ul>
+
+<p>Los primeros resultados se ven normalmente entre 2 y 4 meses. Es una inversión que crece con el tiempo — no un gasto puntual.</p>
+
+<p>¿Te parece bien que hablemos esta semana? Puedo prepararte un análisis inicial gratuito de cómo está {{empresa}} ahora mismo en Google.</p>
+
+<p>Un saludo,<br/>
+<strong>Alex</strong><br/>
+Novitic · <a href="https://novitic.com">novitic.com</a> · info@novitic.com</p>`,
+    },
+    {
+      label: "Upsell IT — clientes sin soporte informático",
+      subject: "{{nombre}}, una cosa que no hemos hablado aún en {{empresa}}",
+      body: `<p>Hola {{nombre}},</p>
+
+<p>¿Qué tal todo por <strong>{{empresa}}</strong>? Espero que bien.</p>
+
+<p>Te escribo porque llevamos tiempo colaborando en la parte de web y quería comentarte algo que suele pasar desapercibido hasta que hay un problema: <strong>¿cómo tenéis gestionado el tema informático del día a día?</strong></p>
+
+<p>Me refiero a los ordenadores, el correo corporativo, los backups, la seguridad... Muchas empresas van tirando sin un proveedor IT de confianza y lo gestionan ellos mismos o esperan a que algo falle. El problema es que cuando algo falla de verdad — un ransomware, un disco duro, una cuenta hackeada — el coste en tiempo y dinero es mucho mayor que el de tener un servicio preventivo.</p>
+
+<p>Lo que ofrecería a <strong>{{empresa}}</strong> como cliente existente:</p>
+<ul>
+  <li>⏱️ <strong>Soporte IT remoto y presencial</strong> — respuesta en menos de 2 horas</li>
+  <li>🔒 <strong>Copias de seguridad automáticas</strong> — todo protegido sin que tengáis que hacer nada</li>
+  <li>🖥️ <strong>Gestión de equipos</strong> — actualizaciones, antivirus y mantenimiento preventivo</li>
+  <li>💰 <strong>Cuota mensual fija</strong> — sin sorpresas, con prioridad al ser cliente nuestro</li>
+</ul>
+
+<p>Si ya contáis con alguien para esto, perfecto. Pero si no es el caso o si estáis contentos con lo que hacemos y queréis ampliar la colaboración, creo que tiene todo el sentido hablarlo.</p>
+
+<p>¿Tienes 15 minutos esta semana?</p>
+
+<p>Un saludo,<br/>
+<strong>Alex</strong><br/>
+Novitic · <a href="https://novitic.com">novitic.com</a> · info@novitic.com</p>`,
+    },
+    {
+      label: "Upsell pack IT + SEO — oferta combinada",
+      subject: "{{nombre}}, una propuesta pensada para {{empresa}}",
+      body: `<p>Hola {{nombre}},</p>
+
+<p>Llevamos un tiempo trabajando bien juntos y quería aprovechar esa confianza para hacerte una propuesta que creo que encaja con el momento en el que está <strong>{{empresa}}</strong>.</p>
+
+<p>He estado pensando en cómo podríamos ayudaros a crecer de forma más completa — no solo con la web, sino con todo lo que la rodea. Y hay dos áreas concretas donde creo que tenéis mucho margen:</p>
+
+<p><strong>1. SEO — que os encuentren en Google</strong></p>
+<p>Tener una buena web es el punto de partida. El siguiente paso es que vuestros clientes potenciales os encuentren cuando buscan lo que ofrecéis. Con un trabajo de posicionamiento bien hecho, {{empresa}} puede aparecer en los primeros resultados para las búsquedas clave de vuestro sector y zona.</p>
+
+<p><strong>2. Soporte IT — tecnología sin interrupciones</strong></p>
+<p>Ordenadores, correo, backups, seguridad... son cosas que cuando funcionan no se notan, pero cuando fallan paralizan el negocio. Con nuestro servicio IT mensual tenéis un equipo detrás que se ocupa de todo esto de forma proactiva.</p>
+
+<p>La ventaja de contratar ambas cosas con nosotros es que lo coordinamos todo — web, posicionamiento e infraestructura — y vosotros os centráis en lo que sabéis hacer.</p>
+
+<p>Para clientes existentes tenemos condiciones preferentes. ¿Te parece bien que preparemos una propuesta específica para {{empresa}} y la revisamos juntos?</p>
 
 <p>Un saludo,<br/>
 <strong>Alex</strong><br/>

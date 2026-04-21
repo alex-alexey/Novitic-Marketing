@@ -8,8 +8,9 @@ export function proxy(request: NextRequest) {
     request.cookies.get("next-auth.session-token") ??
     request.cookies.get("__Secure-next-auth.session-token");
 
-  // Proteger rutas del dashboard
-  if (pathname.startsWith("/dashboard")) {
+  // Proteger rutas principales
+  const protectedPaths = ["/campanas", "/clientes", "/contactos", "/enviados", "/facturacion", "/incidencias", "/plantillas", "/servicios"];
+  if (protectedPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
     if (!sessionToken) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
@@ -17,22 +18,23 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // Proteger APIs (excepto /api/auth, /api/track y /api/unsubscribe que son públicas)
+  // Proteger APIs (excepto las rutas públicas)
   if (
     pathname.startsWith("/api/") &&
     !pathname.startsWith("/api/auth") &&
     !pathname.startsWith("/api/track") &&
-    !pathname.startsWith("/api/unsubscribe")
+    !pathname.startsWith("/api/unsubscribe") &&
+    !pathname.startsWith("/api/soporte")
   ) {
     if (!sessionToken) {
       return NextResponse.json({ error: "No autorizado." }, { status: 401 });
     }
   }
 
-  // Si ya está autenticado y va al login, redirigir al dashboard
+  // Si ya está autenticado y va al login, redirigir al inicio
   if (pathname === "/login") {
     if (sessionToken) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
@@ -40,5 +42,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/api/:path*"],
+  matcher: ["/campanas/:path*", "/clientes/:path*", "/contactos/:path*", "/enviados/:path*", "/facturacion/:path*", "/incidencias/:path*", "/plantillas/:path*", "/servicios/:path*", "/login", "/api/:path*"],
 };

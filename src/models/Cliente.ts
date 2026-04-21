@@ -4,6 +4,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface ServicioCliente {
   nombre: string;
   precio: number;
+  horasIncluidas: number;
   notas?: string;
 }
 
@@ -26,6 +27,7 @@ export interface ICliente extends Document {
   localidad?: string;
   datosFiscales?: DatosFiscales;
   serviciosContratados: ServicioCliente[];
+  tarifaHoraExtra: number;
   estado: "activo" | "inactivo" | "potencial";
   fechaAlta: Date;
   notas?: string;
@@ -37,6 +39,7 @@ export interface ICliente extends Document {
 const ServicioClienteSchema = new Schema<ServicioCliente>({
   nombre: { type: String, required: true },
   precio: { type: Number, required: true },
+  horasIncluidas: { type: Number, default: 0 },
   notas: { type: String },
 }, { _id: false });
 
@@ -59,6 +62,7 @@ const ClienteSchema = new Schema<ICliente>({
   localidad: { type: String },
   datosFiscales: { type: DatosFiscalesSchema },
   serviciosContratados: { type: [ServicioClienteSchema], default: [] },
+  tarifaHoraExtra: { type: Number, default: 0 },
   estado: {
     type: String,
     enum: ["activo", "inactivo", "potencial"],

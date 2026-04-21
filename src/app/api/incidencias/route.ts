@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Incidencia from "@/models/Incidencia";
+import Cliente from "@/models/Cliente";
 import { requireAuth } from "@/lib/auth-guard";
+import { sendEstadoCambioCliente } from "@/lib/mailer";
 import mongoose from "mongoose";
 
 export async function GET(req: NextRequest) {
@@ -74,8 +76,40 @@ export async function PUT(req: NextRequest) {
   const id = searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
   const data = await req.json();
-  const incidencia = await Incidencia.findByIdAndUpdate(id, { $set: data }, { new: true }).populate("clienteId", "nombre empresa");
+
+  const anterior = await Incidencia.findById(id).select("estado emailContacto clienteId titulo").lean();
+  const incidencia = await Incidencia.findByIdAndUpdate(id, { $set: data }, { new: true }).populate("clienteId", "nombre empresa email");
   if (!incidencia) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
+
+  // Enviar email si el estado cambió a algo relevante para el cliente
+  const estadosNotificables = ["en-progreso", "resuelta", "cerrada"];
+  const estadoCambio = data.estado && data.estado !== (anterior as any)?.estado;
+  if (estadoCambio && estadosNotificables.includes(data.estado)) {
+    let emailCliente: string | undefined;
+    let nombreCliente: string | undefined;
+
+    if (incidencia.clienteId && typeof incidencia.clienteId === "object") {
+      const c = incidencia.clienteId as any;
+      emailCliente = c.email;
+      nombreCliente = c.nombre;
+    }
+    if (!emailCliente) emailCliente = incidencia.emailContacto;
+    if (!emailCliente && incidencia.clienteId) {
+      const c = await Cliente.findById(incidencia.clienteId).select("email nombre").lean();
+      if (c) { emailCliente = (c as any).email; nombreCliente = (c as any).nombre; }
+    }
+
+    if (emailCliente) {
+      sendEstadoCambioCliente({
+        ticketId: String(incidencia._id),
+        titulo: incidencia.titulo,
+        nuevoEstado: data.estado,
+        emailCliente,
+        nombreCliente,
+      }).catch(() => {});
+    }
+  }
+
   return NextResponse.json({ incidencia });
 }
 
