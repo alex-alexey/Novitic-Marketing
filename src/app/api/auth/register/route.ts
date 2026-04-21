@@ -4,7 +4,12 @@ import User from "@/models/User";
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, adminSecret } = await req.json();
+
+    const expectedSecret = process.env.ADMIN_REGISTER_SECRET;
+    if (!expectedSecret || adminSecret !== expectedSecret) {
+      return NextResponse.json({ error: "No autorizado." }, { status: 403 });
+    }
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: "Todos los campos son obligatorios." }, { status: 400 });

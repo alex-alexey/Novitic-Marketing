@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
@@ -10,13 +11,29 @@ import {
   Send,
   LogOut,
   ChevronRight,
+  Package,
+  Building2,
+  Receipt,
+  AlertCircle,
+  LayoutGrid,
 } from "lucide-react";
 
-const navItems = [
-  { href: "/dashboard", label: "Inicio", icon: LayoutDashboard, exact: true },
-  { href: "/dashboard/contactos", label: "Contactos", icon: Users },
-  { href: "/dashboard/campanas", label: "Campañas", icon: Megaphone },
-  { href: "/dashboard/enviados", label: "Enviados", icon: Send },
+const clientesItems = [
+  { href: "/clientes/dashboard", label: "Dashboard", icon: LayoutGrid },
+  { href: "/clientes", label: "Clientes", icon: Building2, exact: true },
+  { href: "/facturacion", label: "Facturación", icon: Receipt },
+  { href: "/incidencias", label: "Incidencias", icon: AlertCircle },
+];
+
+const marketingItems = [
+  { href: "/", label: "Inicio", icon: LayoutDashboard, exact: true },
+  { href: "/contactos", label: "Contactos", icon: Users },
+  { href: "/campanas", label: "Campañas", icon: Megaphone },
+  { href: "/enviados", label: "Enviados", icon: Send },
+];
+
+const otherItems = [
+  { href: "/servicios", label: "Servicios", icon: Package },
 ];
 
 export default function Sidebar() {
@@ -26,6 +43,23 @@ export default function Sidebar() {
   function isActive(href: string, exact?: boolean) {
     if (exact) return pathname === href;
     return pathname.startsWith(href);
+  }
+
+  function NavLink({ href, label, icon: Icon, exact }: { href: string; label: string; icon: React.ElementType; exact?: boolean }) {
+    return (
+      <Link
+        href={href}
+        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group ${
+          isActive(href, exact)
+            ? "bg-blue-600 text-white"
+            : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+        }`}
+      >
+        <Icon size={18} />
+        <span className="flex-1">{label}</span>
+        {isActive(href, exact) && <ChevronRight size={14} />}
+      </Link>
+    );
   }
 
   return (
@@ -38,22 +72,28 @@ export default function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map(({ href, label, icon: Icon, exact }) => (
-          <Link
-            key={href}
-            href={href}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group ${
-              isActive(href, exact)
-                ? "bg-blue-600 text-white"
-                : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
-            }`}
-          >
-            <Icon size={18} />
-            <span className="flex-1">{label}</span>
-            {isActive(href, exact) && <ChevronRight size={14} />}
-          </Link>
-        ))}
+      <nav className="flex-1 px-3 py-4">
+        {/* Gestión de Clientes */}
+        <p className="px-3 mb-1 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Gestión de Clientes</p>
+        <div className="space-y-1 mb-4">
+          {clientesItems.map((item) => (
+            <NavLink key={item.href} {...item} />
+          ))}
+        </div>
+        {/* Marketing section */}
+        <p className="px-3 mb-1 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Marketing</p>
+        <div className="space-y-1 mb-4">
+          {marketingItems.map((item) => (
+            <NavLink key={item.href} {...item} />
+          ))}
+        </div>
+        {/* Other */}
+        <p className="px-3 mb-1 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Catálogo</p>
+        <div className="space-y-1">
+          {otherItems.map((item) => (
+            <NavLink key={item.href} {...item} />
+          ))}
+        </div>
       </nav>
 
       {/* User */}
