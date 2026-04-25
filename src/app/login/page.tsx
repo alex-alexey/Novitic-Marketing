@@ -33,7 +33,7 @@ function LoginForm() {
       router.push("/clientes/dashboard");
     }
   }
-
+  
   return (
     <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
       <div className="mb-8 text-center">
