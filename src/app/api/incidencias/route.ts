@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Incidencia from "@/models/Incidencia";
 import Cliente from "@/models/Cliente";
 import { requireAuth } from "@/lib/auth-guard";
-import { sendEstadoCambioCliente } from "@/lib/mailer";
+import { sendEstadoCambioCliente, sendTicketNotificacionInterna, sendTicketConfirmacion } from "@/lib/mailer";
 import mongoose from "mongoose";
 
 export async function GET(req: NextRequest) {
@@ -64,7 +64,41 @@ export async function POST(req: NextRequest) {
   if (!data?.titulo?.trim()) {
     return NextResponse.json({ error: "El título es obligatorio" }, { status: 400 });
   }
-  const incidencia = await Incidencia.create(data);
+
+  // Si falta emailContacto pero hay clienteId, buscar el email del cliente
+  let emailContacto = data.emailContacto;
+  let nombreCliente = data.nombre || data.nombreContacto;
+  if ((!emailContacto || !emailContacto.trim()) && data.clienteId) {
+    const cliente = await Cliente.findById(data.clienteId).select("email nombre").lean();
+    if (cliente) {
+      emailContacto = cliente.email;
+      if (!nombreCliente) nombreCliente = cliente.nombre;
+    }
+  }
+  // Si sigue faltando emailContacto, error
+  if (!emailContacto || !emailContacto.trim()) {
+    return NextResponse.json({ error: "No se ha podido determinar el email del cliente" }, { status: 400 });
+  }
+
+  // Crear incidencia con emailContacto correcto
+  const incidencia = await Incidencia.create({ ...data, emailContacto });
+
+  // Construir objeto ticketOpts igual que en /soporte
+  const ticketOpts = {
+    ticketId: String(incidencia._id),
+    titulo: incidencia.titulo,
+    descripcion: incidencia.descripcion,
+    prioridad: incidencia.prioridad || "media",
+    emailCliente: emailContacto,
+    nombreCliente: nombreCliente || undefined,
+  };
+
+  // Enviar emails en paralelo (confirmación cliente y notificación interna)
+  await Promise.allSettled([
+    sendTicketConfirmacion(ticketOpts),
+    sendTicketNotificacionInterna(ticketOpts),
+  ]);
+
   return NextResponse.json({ incidencia });
 }
 

@@ -1,5 +1,5 @@
 {
-  "name": "novitic-marketing",
+  "name": "novitic",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,9 +14,9 @@
     "dompurify": "^3.4.0",
     "lucide-react": "^1.8.0",
     "mongoose": "^9.4.1",
-    "next": "16.2.4",
+    "next": "^16.2.4",
     "next-auth": "^4.24.14",
-    "nodemailer": "^7.0.13",
+    "nodemailer": "^8.0.5",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

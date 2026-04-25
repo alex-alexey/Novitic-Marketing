@@ -30,7 +30,7 @@ function LoginForm() {
     if (result?.error) {
       setError("Email o contraseña incorrectos.");
     } else {
-      router.push("/");
+      router.push("/clientes/dashboard");
     }
   }
 

@@ -14,8 +14,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Novitic · Gestión",
-  description: "Plataforma de gestión de clientes, incidencias y marketing de Novitic",
+  title: "Novitic · Diseño Web & Servicios IT en Barcelona | Sant Boi de Llobregat",
+  description: "Empresa de diseño web y servicios informáticos en Barcelona y Sant Boi de Llobregat. Páginas web profesionales, tiendas online, mantenimiento informático y consultoría IT para empresas del Baix Llobregat.",
+  keywords: "diseño web Barcelona, servicios IT Barcelona, mantenimiento informático Sant Boi de Llobregat, páginas web empresas Barcelona, desarrollo web Baix Llobregat, empresa informática Barcelona",
+  openGraph: {
+    title: "Novitic · Diseño Web & Servicios IT en Barcelona",
+    description: "Páginas web profesionales y servicios informáticos para empresas en Barcelona, Sant Boi de Llobregat y Baix Llobregat.",
+    locale: "es_ES",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -25,8 +32,8 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="es"
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       {/* suppressHydrationWarning: evita que React loguee warnings de "hydration mismatch"
           cuando extensiones del navegador u otros factores inyectan atributos en el DOM

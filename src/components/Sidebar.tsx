@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import {
@@ -26,7 +27,7 @@ const clientesItems = [
 ];
 
 const marketingItems = [
-  { href: "/", label: "Inicio", icon: LayoutDashboard, exact: true },
+  { href: "/dashboard", label: "Inicio", icon: LayoutDashboard, exact: true },
   { href: "/contactos", label: "Contactos", icon: Users },
   { href: "/campanas", label: "Campañas", icon: Megaphone },
   { href: "/enviados", label: "Enviados", icon: Send },
@@ -63,12 +64,10 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 min-h-screen bg-zinc-900 flex flex-col">
+    <aside className="w-64 shrink-0 bg-zinc-900 flex flex-col sticky top-0 h-screen overflow-y-auto">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-zinc-800">
-        <h1 className="text-white font-bold text-lg tracking-tight">
-          Novitic <span className="text-blue-400">Marketing</span>
-        </h1>
+        <Image src="/novitic-logo.png" alt="Novitic" width={140} height={40} className="h-10 w-auto mix-blend-screen" priority />
       </div>
 
       {/* Nav */}
