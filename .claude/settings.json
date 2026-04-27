@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /Users/robertalexandru/VisualStudio/MarketingNovitic/Novitic/src/app/api/projects/\\\\[id\\\\])",
+      "Bash(mkdir -p /Users/robertalexandru/VisualStudio/MarketingNovitic/Novitic/src/app/api/posts/\\\\[id\\\\])"
+    ]
+  }
+}

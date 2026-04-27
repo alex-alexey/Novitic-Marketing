@@ -17,6 +17,7 @@ import {
   Receipt,
   AlertCircle,
   LayoutGrid,
+  Settings,
 } from "lucide-react";
 
 const clientesItems = [
@@ -35,6 +36,10 @@ const marketingItems = [
 
 const otherItems = [
   { href: "/servicios", label: "Servicios", icon: Package },
+];
+
+const configItems = [
+  { href: "/configuracion", label: "Configuración", icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -88,8 +93,15 @@ export default function Sidebar() {
         </div>
         {/* Other */}
         <p className="px-3 mb-1 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Catálogo</p>
-        <div className="space-y-1">
+        <div className="space-y-1 mb-4">
           {otherItems.map((item) => (
+            <NavLink key={item.href} {...item} />
+          ))}
+        </div>
+        {/* Config */}
+        <p className="px-3 mb-1 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Web</p>
+        <div className="space-y-1">
+          {configItems.map((item) => (
             <NavLink key={item.href} {...item} />
           ))}
         </div>

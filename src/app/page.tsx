@@ -4,88 +4,32 @@ import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { LogoSplash } from "../components/LogoSplash";
 
-const PF_FILTERS = ["Todos", "Desarrollo Web"];
+interface Project {
+  _id: string;
+  name: string;
+  tagline: string;
+  category: string;
+  year: number;
+  bg: string;
+  image: string;
+  client: string;
+  tech: string;
+  status: string;
+  desc: string;
+  link: string;
+}
 
-const PROJECTS = [
-  {
-    id: 1,
-    name: "Aprados Agente Inmobiliario",
-    tagline: "Web corporativa, branding completo, CRM y posicionamiento SEO para agencia inmobiliaria.",
-    category: "Desarrollo Web",
-    year: 2024,
-    bg: "linear-gradient(135deg,#0a1628,#112240)",
-    client: "Aprados",
-    tech: "WordPress, Elementor, PHP, MySQL",
-    status: "Completado",
-    desc: "Desarrollo completo para agencia inmobiliaria: diseño y desarrollo web en WordPress con catálogo de propiedades, identidad de marca (logo, tarjetas de visita y material corporativo), integración de CRM para gestión de clientes y leads, y estrategia de posicionamiento SEO para aumentar la visibilidad orgánica.",
-    link: "https://aprados.com",
-  },
-  {
-    id: 2,
-    name: "Inmobiliaria Lunallar",
-    tagline: "Desarrollo web, mantenimiento informático y gestión de usuarios para agencia inmobiliaria.",
-    category: "Desarrollo Web",
-    year: 2024,
-    bg: "linear-gradient(135deg,#0d2b1a,#1a4a2e)",
-    client: "Lunallar",
-    tech: "WordPress, Elementor",
-    status: "Completado",
-    desc: "Diseño y desarrollo de sitio web corporativo en WordPress con Elementor para agencia inmobiliaria. El proyecto incluyó mantenimiento informático continuo y gestión de usuarios para que el equipo pueda administrar el contenido y las propiedades de forma autónoma.",
-    link: "#",
-  },
-  {
-    id: 3,
-    name: "Clínica Dental Serramar",
-    tagline: "Web con sistema de citas online, SEO local y branding para clínica dental en Castelldefels.",
-    category: "Desarrollo Web",
-    year: 2025,
-    bg: "linear-gradient(135deg,#1a0a28,#2d1245)",
-    client: "Clínica Dental Serramar",
-    tech: "WordPress, WooCommerce, Google My Business",
-    status: "Completado",
-    desc: "Diseño y desarrollo de sitio web profesional para clínica dental en Castelldefels. Incluye sistema de reserva de citas online, página de servicios optimizada para SEO local (Baix Llobregat), integración con Google My Business y rediseño de identidad visual corporativa para diferenciarse de la competencia.",
-    link: "#",
-  },
-  {
-    id: 4,
-    name: "Taller Mecànic Vilafranca",
-    tagline: "Presencia digital completa para taller de automóviles: web, Google Ads y gestión informática.",
-    category: "Desarrollo Web",
-    year: 2025,
-    bg: "linear-gradient(135deg,#1a1200,#3a2800)",
-    client: "Taller Mecànic Vilafranca",
-    tech: "WordPress, Google Ads, Microsoft 365",
-    status: "Completado",
-    desc: "Proyecto integral para taller mecánico en Vilafranca del Penedès: desarrollo de web corporativa con catálogo de servicios y formulario de presupuesto, configuración y gestión de campañas Google Ads para captar clientes locales, y migración completa de su infraestructura informática a Microsoft 365.",
-    link: "#",
-  },
-  {
-    id: 5,
-    name: "Gestoría Montserrat & Asociados",
-    tagline: "Web corporativa multiidioma, área privada de clientes y automatización de documentos para gestoría.",
-    category: "Desarrollo Web",
-    year: 2025,
-    bg: "linear-gradient(135deg,#0a1a1a,#0d3030)",
-    client: "Gestoría Montserrat",
-    tech: "Next.js, Supabase, Tailwind CSS",
-    status: "Completado",
-    desc: "Diseño y desarrollo de plataforma web moderna para gestoría en Sant Boi de Llobregat. El proyecto incluyó web corporativa en español y catalán, portal privado para que los clientes suban y descarguen documentos de forma segura, y automatización de notificaciones por email para avisos de vencimientos fiscales.",
-    link: "#",
-  },
-  {
-    id: 6,
-    name: "Academia de Idiomas Linguo",
-    tagline: "Landing page de alta conversión, tienda online de cursos y branding para academia de idiomas.",
-    category: "Desarrollo Web",
-    year: 2024,
-    bg: "linear-gradient(135deg,#1a0a14,#350a28)",
-    client: "Academia Linguo",
-    tech: "WordPress, WooCommerce, Stripe, Figma",
-    status: "Completado",
-    desc: "Rediseño completo de identidad visual y desarrollo web para academia de idiomas en Barcelona. Incluye tienda online para la venta de cursos y matrículas con pasarela Stripe, landing pages específicas por idioma optimizadas para SEO, e integración con sistema de gestión de alumnos.",
-    link: "#",
-  },
-];
+interface Post {
+  _id: string;
+  title: string;
+  cat: string;
+  excerpt: string;
+  date: string;
+  read: string;
+  featured: boolean;
+  bg: string;
+}
+
 
 const SERVICES: { title: string; desc: string; tags: string[]; featured: boolean; icon: React.ReactNode }[] = [
   {
@@ -216,11 +160,11 @@ const ParticlesBg = dynamic(() => import("../components/ParticlesBg"), { ssr: fa
 
 
 const NAV_LINKS = [
-  { href: "#servicios-it",   label: "Servicios IT" },
-  { href: "#desarrollo-web", label: "Desarrollo Web" },
-  { href: "#portafolio",     label: "Portafolio" },
+  { href: "/servicios-it",   label: "Servicios IT" },
+  { href: "/desarrollo-web",  label: "Desarrollo Web" },
+  { href: "/portafolio",     label: "Portafolio" },
   { href: "#equipo",         label: "Equipo" },
-  { href: "#blog",           label: "Blog" },
+  { href: "/blog",           label: "Blog" },
 ];
 
 export default function HomePage() {
@@ -231,7 +175,9 @@ export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
   const [time, setTime] = useState("");
   const [pfFilter, setPfFilter] = useState("Todos");
-  const [activeProject, setActiveProject] = useState<typeof PROJECTS[0] | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [posts, setPosts]       = useState<Post[]>([]);
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [activeService, setActiveService] = useState<number>(0);
   const [activePrinciple, setActivePrinciple] = useState(0);
 
@@ -266,6 +212,14 @@ export default function HomePage() {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setActiveProject(null); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/projects").then((r) => r.json()).then(setProjects).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/posts?published=true").then((r) => r.json()).then(setPosts).catch(() => {});
   }, []);
 
   // Observer global para data-reveal / reveal-stagger
@@ -348,7 +302,7 @@ export default function HomePage() {
 
           <div className={`hdr-right${contentVisible ? " hdr-right-visible" : ""}`}>
             <div className="hdr-time">
-              Madrid, España <span>{time}</span>
+              Barcelona, España <span>{time}</span>
             </div>
 
             <a href="tel:+34600000000" className="hdr-phone-btn" aria-label="Teléfono">
@@ -424,7 +378,7 @@ export default function HomePage() {
             {/* Contador + cerrar */}
             <div className="pf-popup-topbar">
               <span className="pf-popup-num">
-                {String(activeProject.id).padStart(2, "0")} / {String(PROJECTS.length).padStart(2, "0")}
+                {String(projects.findIndex((p) => p._id === activeProject._id) + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}
               </span>
               <button className="pf-popup-close" onClick={() => setActiveProject(null)} aria-label="Cerrar">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -433,8 +387,14 @@ export default function HomePage() {
               </button>
             </div>
 
-            {/* Hero con gradiente del proyecto */}
-            <div className="pf-popup-hero" style={{ background: activeProject.bg }}>
+            {/* Hero: imagen si existe, gradiente si no */}
+            <div
+              className="pf-popup-hero"
+              style={{
+                background: activeProject.bg,
+                ...(activeProject.image ? { backgroundImage: `url(${activeProject.image})`, backgroundSize: "cover", backgroundPosition: "center" } : {}),
+              }}
+            >
               <div className="pf-popup-hero-inner">
                 <span className="pf-popup-tag">{activeProject.category}</span>
                 <h2 className="pf-popup-title">{activeProject.name}</h2>
@@ -500,7 +460,7 @@ export default function HomePage() {
 
               <div className="hero-actions">
                 <a href="#contacto" className="hero-cta-primary">Quiero mi web única</a>
-                <a href="#portafolio" className="hero-cta-ghost">Ver portafolio</a>
+                <a href="/portafolio" className="hero-cta-ghost">Ver portafolio</a>
               </div>
 
               {/* Tech badges */}
@@ -775,14 +735,14 @@ export default function HomePage() {
         </div>
 
         {/* ==================== PORTAFOLIO ==================== */}
-  <section id="portafolio" className="py-28 bg-[#050505]">
+        <section id="portafolio" className="py-28 bg-[#050505]">
           <div className="max-w-6xl mx-auto px-6">
             <h2 data-reveal className="text-5xl font-bold text-center mb-4 tracking-tight">Portafolio</h2>
-            <p data-reveal data-delay="80" className="text-center text-white/50 mb-12">Más de 50 proyectos entregados para clientes de España y Europa.</p>
+            <p data-reveal data-delay="80" className="text-center text-white/50 mb-12">Proyectos entregados para clientes de España y Europa.</p>
 
-            {/* Filtros */}
+            {/* Filtros dinámicos según categorías disponibles */}
             <div data-reveal data-delay="160" className="pf-filters">
-              {PF_FILTERS.map((f) => (
+              {["Todos", ...Array.from(new Set(projects.map((p) => p.category)))].map((f) => (
                 <button
                   key={f}
                   className={`pf-filter-btn${pfFilter === f ? " active" : ""}`}
@@ -794,37 +754,58 @@ export default function HomePage() {
             </div>
 
             {/* Grid */}
-            <div data-reveal data-delay="240" className="pf-grid reveal-stagger">
-              {PROJECTS.filter((p) => pfFilter === "Todos" || p.category === pfFilter).map((p) => (
-                <div key={p.id} className="pf-item" onClick={() => setActiveProject(p)}>
-                  <div className="pf-mask">
-                    <div className="pf-mask-inner" />
-                  </div>
+            {projects.length === 0 ? (
+              <p className="text-center text-white/20 text-sm py-16">Cargando proyectos…</p>
+            ) : (
+              <div data-reveal data-delay="240" className="pf-grid reveal-stagger">
+                {projects.filter((p) => pfFilter === "Todos" || p.category === pfFilter).map((p) => (
+                  <div key={p._id} className="pf-item" onClick={() => setActiveProject(p)}>
+                    <div className="pf-mask"><div className="pf-mask-inner" /></div>
 
-                  <div className="pf-image">
-                    <div className="pf-placeholder" style={{ background: p.bg, width: "80%", aspectRatio: "16/10" }} />
-                  </div>
+                    <div className="pf-image">
+                      {p.image ? (
+                        <img
+                          src={p.image}
+                          alt={p.name}
+                          className="pf-placeholder"
+                          style={{ width: "80%", aspectRatio: "16/10", objectFit: "cover", borderRadius: "0.5rem" }}
+                        />
+                      ) : (
+                        <div className="pf-placeholder" style={{ background: p.bg, width: "80%", aspectRatio: "16/10" }} />
+                      )}
+                    </div>
 
-                  <div className="pf-inner">
-                    <div className="pf-left">
-                      <div>
-                        <p className="pf-name">{p.name}</p>
-                        <span className="pf-tagline">{p.tagline}</span>
+                    <div className="pf-inner">
+                      <div className="pf-left">
+                        <div>
+                          <p className="pf-name">{p.name}</p>
+                          <span className="pf-tagline">{p.tagline}</span>
+                        </div>
+                        <p className="pf-year">{p.year}</p>
                       </div>
-                      <p className="pf-year">{p.year}</p>
-                    </div>
-                    <div className="pf-right">
-                      <span className="pf-tag">{p.category}</span>
-                      <div className="pf-cta">
-                        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M10 0c.423 0 .766.343.766.766v8.467h8.468a.766.766 0 1 1 0 1.533h-8.468v8.468a.766.766 0 1 1-1.532 0l-.001-8.468H.766a.766.766 0 0 1 0-1.532l8.467-.001V.766A.768.768 0 0 1 10 0Z" fill="currentColor"/>
-                        </svg>
+                      <div className="pf-right">
+                        <span className="pf-tag">{p.category}</span>
+                        <div className="pf-cta">
+                          <svg viewBox="0 0 20 20" fill="none">
+                            <path d="M10 0c.423 0 .766.343.766.766v8.467h8.468a.766.766 0 1 1 0 1.533h-8.468v8.468a.766.766 0 1 1-1.532 0l-.001-8.468H.766a.766.766 0 0 1 0-1.532l8.467-.001V.766A.768.768 0 0 1 10 0Z" fill="currentColor"/>
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+
+            {/* Ver más */}
+            {projects.length > 0 && (
+              <div className="text-center mt-12">
+                <a href="/portafolio" className="inline-flex items-center gap-2 text-sm font-semibold text-white/40 hover:text-white border border-white/12 hover:border-white/30 rounded-full px-6 py-2.5 transition-all">
+                  Ver portafolio completo
+                  <svg viewBox="0 0 14 15" fill="none" width="11" height="11"><path d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z" fill="currentColor"/></svg>
+                </a>
+              </div>
+            )}
           </div>
         </section>
 
@@ -904,24 +885,93 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ==================== BLOG / FAQ ==================== */}
-  <section id="blog" className="py-28 border-t border-white/10">
-          <div className="max-w-4xl mx-auto px-6">
-            <h2 data-reveal className="text-5xl font-bold text-center mb-16">Blog & FAQ</h2>
+        {/* ==================== BLOG ==================== */}
+        <section id="blog" className="blog-section">
+          <div className="blog-inner">
 
-            <div data-reveal data-delay="120" className="space-y-6 reveal-stagger">
-              {[
-                { q: "¿Cuánto tarda en desarrollarse una web?", a: "Dependiendo de la complejidad, normalmente entre 3 y 8 semanas." },
-                { q: "¿Trabajáis con clientes internacionales?", a: "Sí, colaboramos con clientes de España, Europa y América Latina." },
-                { q: "¿Ofrecéis soporte y mantenimiento?", a: "Sí, disponemos de paquetes completos de mantenimiento y soporte técnico." },
-                { q: "¿Puedo empezar solo con el diseño?", a: "Sí, nuestros servicios son flexibles y se adaptan a tus necesidades." },
-              ].map((item, idx) => (
-                <div key={idx} className="bg-white/5 border border-white/10 rounded-3xl p-8">
-                  <h3 className="font-semibold text-lg mb-3">{item.q}</h3>
-                  <p className="text-white/70">{item.a}</p>
-                </div>
-              ))}
+            {/* Header */}
+            <div data-reveal className="blog-hdr">
+              <div className="blog-hdr-left">
+                <p className="blog-eyebrow">Actualidad</p>
+                <h2 className="blog-h2">Blog</h2>
+                <p className="blog-sub">Consejos, guías y novedades sobre tecnología, diseño web y marketing digital.</p>
+              </div>
+              <a href="/blog" className="blog-see-all">
+                Ver todos los artículos
+                <svg viewBox="0 0 14 15" fill="none"><path d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z" fill="currentColor"/></svg>
+              </a>
             </div>
+
+            {posts.length === 0 ? (
+              <p className="text-white/20 text-sm text-center py-16">Todavía no hay artículos publicados.</p>
+            ) : (
+              <>
+                {/* Layout principal: featured + stack lateral */}
+                <div data-reveal data-delay="100" className="blog-layout">
+                  {/* ── Artículo destacado ── */}
+                  <article className="blog-featured">
+                    <div className="blog-featured-img">
+                      <div className="blog-featured-img-inner" style={{ background: posts[0].bg }} />
+                    </div>
+                    <div className="blog-featured-body">
+                      <span className="blog-cat-pill">{posts[0].cat}</span>
+                      <h3 className="blog-featured-title">{posts[0].title}</h3>
+                      <p className="blog-featured-excerpt">{posts[0].excerpt}</p>
+                      <div className="blog-meta-row">
+                        <div className="blog-meta-left">
+                          <div className="blog-avatar">N</div>
+                          <div>
+                            <p className="blog-author">Novitic</p>
+                            <p className="blog-date">{posts[0].date}</p>
+                          </div>
+                        </div>
+                        <span className="blog-read">{posts[0].read} lectura</span>
+                        <div className="blog-featured-arrow">
+                          <svg viewBox="0 0 14 15" fill="none"><path d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z" fill="currentColor"/></svg>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+
+                  {/* ── Stack lateral ── */}
+                  <div className="blog-side">
+                    {posts.slice(1, 4).map((post) => (
+                      <article key={post._id} className="blog-card">
+                        <div className="blog-card-thumb">
+                          <div className="blog-card-thumb-inner" style={{ background: post.bg }} />
+                        </div>
+                        <div className="blog-card-body">
+                          <p className="blog-card-cat">{post.cat}</p>
+                          <h3 className="blog-card-title">{post.title}</h3>
+                          <p className="blog-card-info">{post.date} · {post.read} lectura</p>
+                        </div>
+                        <div className="blog-card-arrow">
+                          <svg viewBox="0 0 14 15" fill="none"><path d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z" fill="currentColor"/></svg>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Fila inferior: 3 tarjetas verticales */}
+                {posts.length > 4 && (
+                  <div data-reveal data-delay="200" className="blog-bottom">
+                    {posts.slice(4, 7).map((post) => (
+                      <article key={post._id} className="blog-card-v">
+                        <div className="blog-card-v-img">
+                          <div className="blog-card-v-img-inner" style={{ background: post.bg }} />
+                        </div>
+                        <div className="blog-card-v-body">
+                          <p className="blog-card-v-cat">{post.cat}</p>
+                          <h3 className="blog-card-v-title">{post.title}</h3>
+                          <p className="blog-card-v-info">{post.date} · {post.read} lectura</p>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </section>
 
@@ -962,7 +1012,7 @@ export default function HomePage() {
             <div className="flex flex-wrap justify-center gap-6 text-sm text-white/60 mb-8">
               <a href="#desarrollo-web" className="hover:text-white">Desarrollo Web</a>
               <a href="#servicios-it"   className="hover:text-white">Servicios IT</a>
-              <a href="#portafolio"     className="hover:text-white">Portafolio</a>
+              <a href="/portafolio"     className="hover:text-white">Portafolio</a>
               <a href="#equipo"         className="hover:text-white">Equipo</a>
               <a href="#contacto"       className="hover:text-white">Contacto</a>
             </div>
